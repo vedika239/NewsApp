@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-lg-10 col-xl-9">
+
+    <!-- 🔹 Page Header -->
+    <div class="mb-4">
+      <h2 class="fw-bold">🤖 AI News Bot</h2>
+      <p class="text-muted mb-0">
+        Search real-time news and verify credibility using AI.
+      </p>
+    </div>
+
+    <!-- 🔍 Live News Search -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title mb-3">🔍 Search Live News</h5>
+
+        <form method="post">
+          <div class="row g-3 align-items-end">
+
+            <div class="col-md-8">
+              <label class="form-label">
+                Keywords <span class="text-danger">*</span>
+              </label>
+              <input
+                class="form-control"
+                name="info"
+                required
+                placeholder="AI startups, elections, WHO climate report"
+                value="{{ request.form.info or '' }}"
+              >
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Date (optional)</label>
+              <input
+                class="form-control"
+                type="date"
+                name="date"
+                value="{{ request.form.date or '' }}"
+              >
+            </div>
+
+          </div>
+
+          <div class="mt-4">
+            <button class="btn btn-success px-4">
+              <i class="bi bi-search me-1"></i> Search News
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 🧠 Fake News Detector (MAIN FEATURE – KEPT) -->
+    <div class="card shadow-sm mb-4 border-warning">
+      <div class="card-body">
+        <h5 class="card-title mb-3">🧠 Fake News Detector</h5>
+
+        <form method="post" action="{{ url_for('verify_news') }}">
+          <label class="form-label">Paste news text</label>
+
+          <textarea
+            class="form-control"
+            name="news_text"
+            rows="4"
+            placeholder="Paste article or headline text here..."
+            required
+          ></textarea>
+
+          <div class="mt-3">
+            <button class="btn btn-warning px-4">
+              <i class="bi bi-shield-check me-1"></i> Check Credibility
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 📰 RESULTS SECTION (ANCHOR TARGET) -->
+    {% if results is not none %}
+      <div id="news-results" class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-3">📰 Search Results</h5>
+
+          {% if results %}
+            <ul class="list-group list-group-flush">
+              {% for r in results %}
+                <li class="list-group-item py-3">
+                  <h6 class="mb-1">{{ r.title }}</h6>
+
+                  <small class="text-muted">
+                    {{ r.publishedAt }}
+                    {% if r.source %} | {{ r.source }}{% endif %}
+                  </small>
+
+                  {% if r.description %}
+                    <p class="mt-2 mb-2 text-muted">
+                      {{ r.description }}
+                    </p>
+                  {% endif %}
+
+                  {% if r.url %}
+                    <a href="{{ r.url }}" target="_blank" rel="noopener noreferrer">
+                      Read full article →
+                    </a>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="alert alert-info mb-0">
+              No matching live news found.
+              Try changing keywords or removing the date.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<!-- ✅ AUTO-SCROLL TO RESULTS -->
+{% if results is not none %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const results = document.getElementById("news-results");
+    if (results) {
+      results.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+</script>
+{% endif %}
+
+{% endblock %}

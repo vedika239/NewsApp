@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- ✅ NICHE SELECTOR -->
+<div class="card mb-4 shadow-sm">
+  <div class="card-body">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h5 class="mb-0">Choose Your Niches</h5>
+        <small class="text-muted">Select between 1 and 6 to personalize your feed</small>
+      </div>
+    </div>
+
+    <form method="post" action="{{ url_for('news_list') }}">
+      <div class="row g-3">
+
+        {% for n in niches %}
+        <div class="col-6 col-md-4 col-lg-3">
+          <label class="niche-tile w-100">
+            <input
+              type="checkbox"
+              name="niches"
+              value="{{ n }}"
+              {% if n in user_niches %}checked{% endif %}
+            >
+            <span>{{ n }}</span>
+          </label>
+        </div>
+        {% endfor %}
+
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <small class="text-muted">
+          You can select up to 6 niches
+        </small>
+        <button class="btn btn-primary px-4" type="submit">
+          Search News
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<!-- ✅ News List -->
+{% if news_items %}
+  <ul class="list-group">
+    {% for item in news_items %}
+      <li class="list-group-item">
+        <h5>
+          <a href="{{ url_for('news_detail', news_id=item.id) }}">{{ item.title }}</a>
+        </h5>
+        <small>{{ item.date }} | {{ item.niche }}</small>
+        <p class="mb-0">{{ item.content[:180] }}...</p>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No news found yet. (Select niches above and refresh.)</p>
+{% endif %}
+
+{% endblock %}
